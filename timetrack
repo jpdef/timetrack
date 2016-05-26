@@ -1,0 +1,122 @@
+#!/usr/bin/env python2.7
+import pyunix
+import sys
+import os
+import subprocess
+import csv
+import time
+import datetime
+
+month_file = "/home/jpdef/workspace/DEV/timetrack/may-2016.csv"
+month_file_scramble = "/home/jpdef/workspace/DEV/timetrack/may-2016.csv.asc"
+
+def how_many_minutes(start,end):
+    hstart , mstart = start.tm_hour, start.tm_min
+    hend   , mend = end.tm_hour, end.tm_min
+    
+    return (hend - hstart)*60 + (mend -mstart)
+
+def write_start(subject):
+    with open(month_file,"a") as trackfile:
+        trackwriter = csv.writer(trackfile, delimiter=',')
+        trackwriter.writerow([subject,datetime.datetime.now().strftime("%H:%M")])
+
+def write_date():
+    with open(month_file,"a") as trackfile:
+        trackwriter = csv.writer(trackfile, delimiter=',')
+        trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
+
+def update_remote():
+  encryptsc.encrypt("tomyris",month_file)
+  encryptsc.gitcommit(today)
+  encryptsc.gitpush()
+
+def update_local():
+  #encryptsc.gitdiff()
+  encryptsc.gitpull()
+  encryptsc.decrypt()
+
+if len(sys.argv) > 1 : 
+     #Usage
+     if sys.argv[1] == "--total":
+        with open(month_file,"rb") as trackfile:
+            trackreader = csv.reader(trackfile)
+            total = 0
+            for row in trackreader:
+                if len(row) > 2 :
+                    start = time.strptime(row[1], "%H:%M")
+                    end   = time.strptime(row[2], "%H:%M")
+                    total += how_many_minutes(start,end)
+                    print "{} {} minutes".format(row[0] ,how_many_minutes(start,end))
+        print "Total := {} minutes".format(total)
+     
+     elif sys.argv[1] == "--today":
+        with open(month_file,"rb") as trackfile:
+            trackreader = csv.reader(trackfile)
+            total = 0
+            today = False
+            for row in trackreader:
+                if row[0] == datetime.datetime.now().strftime("%m-%d"):
+                    today = True
+                elif len(row) > 2 and today :
+                    start = time.strptime(row[1], "%H:%M")
+                    end   = time.strptime(row[2], "%H:%M")
+                    total += how_many_minutes(start,end)
+                    print "{} {} minutes".format(row[0] ,how_many_minutes(start,end))
+                else :
+                    today = False
+        print "Total := {} minutes".format(total)
+     
+     elif sys.argv[1] == "--date":
+        with open(month_file,"rb") as trackfile:
+            trackreader = csv.reader(trackfile)
+            total = 0
+            today = False
+            for row in trackreader:
+                if row[0] == sys.argv[2] :
+                    today = True
+                elif len(row) > 2 and today :
+                    start = time.strptime(row[1], "%H:%M")
+                    end   = time.strptime(row[2], "%H:%M")
+                    total += how_many_minutes(start,end)
+                    print "{} {} minutes".format(row[0] ,how_many_minutes(start,end))
+                else :
+                    today = False
+        print "Total := {} minutes".format(total)
+
+     elif sys.argv[1] == "--start-day": 
+         write_date() 
+         write_start(sys.argv[2])
+  
+     elif sys.argv[1] == "--start":
+         write_start(sys.argv[2])
+           
+     elif sys.argv[1] == "--end":
+        rows = [] 
+        lastentry = "no end"
+        with open(month_file,"rb") as trackfile:
+            trackreader = csv.reader(trackfile)
+            for row in trackreader:
+                rows.append( row )
+                lastentry = row
+        with open(month_file,"wb") as trackfile:
+             trackwriter = csv.writer(trackfile, delimiter=',')
+             for row in rows:
+                 if row == lastentry:
+                     lastentry.append(datetime.datetime.now().strftime("%H:%M"))
+                     lastentry.append(sys.argv[2]) 
+                     trackwriter.writerow(lastentry)
+                 else:
+                     trackwriter.writerow(row)
+     elif sys.argv[1] == "--show":
+            print pyunix.cat(month_file)
+   
+     elif sys.argv[1] == "--edit":
+            subprocess.call(["vim",month_file])
+     else :
+         #New Entries
+         with open(month_file,"a") as trackfile:
+             trackwriter = csv.writer(trackfile, delimiter=',')
+             trackwriter.writerow(sys.argv[1:])
+else : 
+   print "Usage timetrack -option [ticket] [start] [end] [comment]"
