@@ -1,6 +1,5 @@
 #!/usr/bin/env python2.7
 import pyunix
-import encryptsc
 import sys
 import os
 import subprocess
@@ -8,11 +7,8 @@ import csv
 import time
 import datetime
 
-data_dir="/home/jpdef/Workspace/timetrack/"
-month_file = data_dir + "may-2016.csv"
-month_file_scramble = data_dir + "may-2016.csv.asc"
-user="cyrus"
-today = datetime.date.today().strftime("%d-%m-%y")
+month_file = "/home/jpdef/workspace/DEV/timetrack/may-2016.csv"
+month_file_scramble = "/home/jpdef/workspace/DEV/timetrack/may-2016.csv.asc"
 
 def how_many_minutes(start,end):
     hstart , mstart = start.tm_hour, start.tm_min
@@ -31,7 +27,7 @@ def write_date():
         trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
 
 def update_remote():
-  encryptsc.encrypt(user,month_file)
+  encryptsc.encrypt("tomyris",month_file)
   encryptsc.gitcommit(today)
   encryptsc.gitpush()
 
@@ -121,8 +117,12 @@ if len(sys.argv) > 1 :
      elif sys.argv[1] == "--update-remote":
          update_remote()
  
+     else sys.argv[1] == "--add":
+         #New Entries
+         with open(month_file,"a") as trackfile:
+             trackwriter = csv.writer(trackfile, delimiter=',')
+             trackwriter.writerow(sys.argv[1:])
      else:
          print "Usage timetrack -option [ticket] [start] [end] [comment]"
-           
 else : 
    print "Usage timetrack -option [ticket] [start] [end] [comment]"
