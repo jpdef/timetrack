@@ -7,8 +7,9 @@ import csv
 import time
 import datetime
 
-month_file = "/home/jpdef/workspace/DEV/timetrack/may-2016.csv"
-month_file_scramble = "/home/jpdef/workspace/DEV/timetrack/may-2016.csv.asc"
+data_dir ="/home/jpdef/Workspace/timetrack/"
+month_file = data_dir+"may-2016.csv"
+month_file_scramble = data_dir+"may-2016.csv.asc"
 
 def how_many_minutes(start,end):
     hstart , mstart = start.tm_hour, start.tm_min
@@ -109,11 +110,11 @@ if len(sys.argv) > 1 :
                  else:
                      trackwriter.writerow(row)
      elif sys.argv[1] == "--show":
-         print pyunix.cat(month_file)
-  
+            print pyunix.cat(month_file)
+   
      elif sys.argv[1] == "--edit":
-         subprocess.call(["vim",month_file])
-  
+            subprocess.call(["vim",month_file])
+     
      elif sys.argv[1] == "--update-remote":
          update_remote()
  
