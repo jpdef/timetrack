@@ -113,16 +113,16 @@ if len(sys.argv) > 1 :
                  else:
                      trackwriter.writerow(row)
      elif sys.argv[1] == "--show":
-            print pyunix.cat(month_file)
-   
+         print pyunix.cat(month_file)
+  
      elif sys.argv[1] == "--edit":
-            subprocess.call(["vim",month_file])
+         subprocess.call(["vim",month_file])
+  
      elif sys.argv[1] == "--update-remote":
-            update_remote()
-     else :
-         #New Entries
-         with open(month_file,"a") as trackfile:
-             trackwriter = csv.writer(trackfile, delimiter=',')
-             trackwriter.writerow(sys.argv[1:])
+         update_remote()
+ 
+     else:
+         print "Usage timetrack -option [ticket] [start] [end] [comment]"
+           
 else : 
    print "Usage timetrack -option [ticket] [start] [end] [comment]"
