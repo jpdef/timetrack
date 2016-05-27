@@ -117,7 +117,7 @@ if len(sys.argv) > 1 :
      elif sys.argv[1] == "--update-remote":
          update_remote()
  
-     else sys.argv[1] == "--add":
+     elif sys.argv[1] == "--add":
          #New Entries
          with open(month_file,"a") as trackfile:
              trackwriter = csv.writer(trackfile, delimiter=',')
