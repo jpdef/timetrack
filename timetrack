@@ -6,10 +6,12 @@ import subprocess
 import csv
 import time
 import datetime
+import encryptsc
 
 data_dir ="/home/jpdef/Workspace/timetrack/"
 month_file = data_dir+"may-2016.csv"
 month_file_scramble = data_dir+"may-2016.csv.asc"
+todayCommit = datetime.date.today().strftime("%d-%m-%y")
 
 def how_many_minutes(start,end):
     hstart , mstart = start.tm_hour, start.tm_min
@@ -27,9 +29,9 @@ def write_date():
         trackwriter = csv.writer(trackfile, delimiter=',')
         trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
 
-def update_remote():
-  encryptsc.encrypt("tomyris",month_file)
-  encryptsc.gitcommit(today)
+def update_remote(forWhom):
+  encryptsc.encrypt("forWhom",month_file)
+  encryptsc.gitcommit(todayCommit)
   encryptsc.gitpush()
 
 def update_local():
@@ -116,13 +118,16 @@ if len(sys.argv) > 1 :
             subprocess.call(["vim",month_file])
      
      elif sys.argv[1] == "--update-remote":
-         update_remote()
+        if(len(sys.argv) < 2):
+            print "Needs a reciepent"; 
+        else:
+            update_remote(sys.argv[2])
  
      elif sys.argv[1] == "--add":
          #New Entries
          with open(month_file,"a") as trackfile:
              trackwriter = csv.writer(trackfile, delimiter=',')
-             trackwriter.writerow(sys.argv[1:])
+             trackwriter.writerow(sys.argv[2:])
      else:
          print "Usage timetrack -option [ticket] [start] [end] [comment]"
 else : 

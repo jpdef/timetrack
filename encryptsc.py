@@ -6,7 +6,6 @@ import os
 import time
 import datetime
 
-today = datetime.date.today().strftime("%d-%m-%y")
 
 def encrypt(uid,fname):
   cmd = "gpg";
