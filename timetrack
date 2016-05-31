@@ -30,7 +30,7 @@ def write_date():
         trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
 
 def update_remote(forWhom):
-  encryptsc.encrypt("forWhom",month_file)
+  encryptsc.encrypt(forWhom,month_file)
   encryptsc.gitcommit(todayCommit)
   encryptsc.gitpush()
 
