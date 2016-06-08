@@ -8,9 +8,9 @@ import time
 import datetime
 import encryptsc
 
-data_dir ="/home/jpdef/Workspace/timetrack/"
-month_file = data_dir+"may-2016.csv"
-month_file_scramble = data_dir+"may-2016.csv.asc"
+data_dir = os.environ.get("TIMETRACKPATH")
+month_file = data_dir + "/june-2016.csv"
+month_file_scramble = data_dir + "/june-2016.csv.asc"
 todayCommit = datetime.date.today().strftime("%d-%m-%y")
 
 def how_many_minutes(start,end):
@@ -29,17 +29,36 @@ def write_date():
         trackwriter = csv.writer(trackfile, delimiter=',')
         trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
 
+def exists(key,column):
+    with open(month_file,"rb") as trackfile:
+        trackreader = csv.reader(trackfile)
+        found = False
+        for row in trackreader:
+            if row[column] == key :
+                found = True
+        return found
+
+def todayexists():
+    return exists(datetime.datetime.now().strftime("%m-%d"),0)
+    
 def update_remote(forWhom):
   encryptsc.encrypt(forWhom,month_file)
   encryptsc.gitcommit(todayCommit)
   encryptsc.gitpush()
 
 def update_local():
-  #encryptsc.gitdiff()
   encryptsc.gitpull()
-  encryptsc.decrypt()
+  encryptsc.decrypt(month_file_scramble)
+
+def add(content):
+  #New Entries
+  with open(month_file,"a") as trackfile:
+      trackwriter = csv.writer(trackfile, delimiter=',')
+      trackwriter.writerow(content)
 
 if len(sys.argv) > 1 : 
+     if( not todayexists()):
+         write_date()   
      #Usage
      if sys.argv[1] == "--total":
         with open(month_file,"rb") as trackfile:
@@ -89,7 +108,8 @@ if len(sys.argv) > 1 :
 
      elif sys.argv[1] == "--start-day": 
          write_date() 
-         write_start(sys.argv[2])
+         if(len(sys.argv) > 1):
+             write_start(sys.argv[2])
   
      elif sys.argv[1] == "--start":
          write_start(sys.argv[2])
@@ -125,9 +145,7 @@ if len(sys.argv) > 1 :
  
      elif sys.argv[1] == "--add":
          #New Entries
-         with open(month_file,"a") as trackfile:
-             trackwriter = csv.writer(trackfile, delimiter=',')
-             trackwriter.writerow(sys.argv[2:])
+         add(sys.argv[2:])
      else:
          print "Usage timetrack -option [ticket] [start] [end] [comment]"
 else : 

@@ -37,6 +37,17 @@ def docmd(cmd,uargs,input=None):
 def echo(sound):
     return docmd("echo",[sound])
 
+def cd(directory):
+    return docmd("cd",[directory])
+
+def jump(path,cmd,uargs):
+  cwd = os.getcwd()
+  jmpcmd = " ".join(["cd",path,"&&",cmd,"&&","cd",cwd])
+  return docmd(jmpcmd,[])
+
+def pwd():
+  return docmd("pwd",[])
+
 def mkdir(fname,fpath=os.getcwd()):
     strdir = os.path.join(fpath,fname)
     return docmd("mkdir",[strdir])
