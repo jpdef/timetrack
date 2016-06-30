@@ -7,6 +7,7 @@ import csv
 import time
 import datetime
 import encryptsc
+import argparse
 
 data_dir = os.environ.get("TIMETRACKPATH")
 month_file = data_dir + "/june-2016.csv"
@@ -33,11 +34,25 @@ def exists(key,column):
     with open(month_file,"rb") as trackfile:
         trackreader = csv.reader(trackfile)
         found = False
+        intRow = 0
         for row in trackreader:
+            intRow += 1
             if row[column] == key :
                 found = True
-        return found
+                break
+        if (found):
+           return row
+        else:
+           return 0
 
+def calcTimeRow(row):
+    if(len(row) > 1):
+        start = time.strptime(row[1], "%H:%M")
+        end   = time.strptime(row[2], "%H:%M")
+        return  how_many_minutes(start,end)
+    else: 
+        return 0
+    
 def todayexists():
     return exists(datetime.datetime.now().strftime("%m-%d"),0)
     
@@ -56,6 +71,8 @@ def add(content):
       trackwriter = csv.writer(trackfile, delimiter=',')
       trackwriter.writerow(content)
 
+
+
 if len(sys.argv) > 1 : 
      if( not todayexists()):
          write_date()   
@@ -66,9 +83,7 @@ if len(sys.argv) > 1 :
             total = 0
             for row in trackreader:
                 if len(row) > 2 :
-                    start = time.strptime(row[1], "%H:%M")
-                    end   = time.strptime(row[2], "%H:%M")
-                    total += how_many_minutes(start,end)
+                    total += calcTimeRow(row) 
                     print "{} {} minutes".format(row[0] ,how_many_minutes(start,end))
         print "Total := {} minutes".format(total)
      
@@ -146,6 +161,19 @@ if len(sys.argv) > 1 :
      elif sys.argv[1] == "--add":
          #New Entries
          add(sys.argv[2:])
+     elif sys.argv[1] == "--sum":
+         #Calculate time on ticket
+         if(len(sys.argv) < 4):
+            print "Incorrect usage"
+         else:
+            sum = 0 
+            ticketType = sys.argv[2] 
+            with open(month_file,"rb") as trackfile:
+                trackreader = csv.reader(trackfile)
+                for row in trackreader:
+                    if(row[0] == ticketType):
+                       sum +=  calcTimeRow(row)
+            print sum 
      else:
          print "Usage timetrack -option [ticket] [start] [end] [comment]"
 else : 
