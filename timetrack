@@ -10,8 +10,8 @@ import encryptsc
 import argparse
 
 data_dir = os.environ.get("TIMETRACKPATH")
-month_file = data_dir + "/june-2016.csv"
-month_file_scramble = data_dir + "/june-2016.csv.asc"
+month_file = data_dir + "/july-2016.csv"
+month_file_scramble = data_dir + "/july-2016.csv.asc"
 todayCommit = datetime.date.today().strftime("%d-%m-%y")
 
 def how_many_minutes(start,end):
@@ -157,6 +157,9 @@ if len(sys.argv) > 1 :
             print "Needs a reciepent"; 
         else:
             update_remote(sys.argv[2])
+     
+     elif sys.argv[1] == "--update-local":
+          update_local()
  
      elif sys.argv[1] == "--add":
          #New Entries
