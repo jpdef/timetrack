@@ -165,6 +165,9 @@ if len(sys.argv) > 1 :
             print "Needs a reciepent"; 
         else:
             update_remote(sys.argv[2])
+     
+     elif sys.argv[1] == "--update-local":
+          update_local()
  
      elif sys.argv[1] == "--add":
          #New Entries
