@@ -189,9 +189,3 @@ if len(sys.argv) > 1 :
          print "Usage timetrack -option [ticket] [start] [end] [comment]"
 else : 
    print "Usage timetrack -option [ticket] [start] [end] [comment]"
-            
-with open(month_file,"rb") as trackfile:
-     trackreader = csv.reader(trackfile)
-     for row in trackreader:
-         if isDate(row):
-            print row[0]
