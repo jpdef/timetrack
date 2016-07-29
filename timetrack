@@ -30,20 +30,19 @@ def write_date():
         trackwriter = csv.writer(trackfile, delimiter=',')
         trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
 
-def exists(key,column):
+def find(key,column):
     with open(month_file,"rb") as trackfile:
         trackreader = csv.reader(trackfile)
         found = False
-        intRow = 0
+        data =[]
         for row in trackreader:
-            intRow += 1
             if row[column] == key :
                 found = True
-                break
+                data.append(row)
         if (found):
-           return row
+           return (True,data)
         else:
-           return 0
+           return (False,[])
 
 def calcTimeRow(row):
     if(len(row) > 1):
@@ -54,8 +53,9 @@ def calcTimeRow(row):
         return 0
     
 def todayexists():
-    return exists(datetime.datetime.now().strftime("%m-%d"),0)
-    
+    foundSomething, something = find(datetime.datetime.now().strftime("%m-%d"),0)
+    return foundSomething
+
 def update_remote(forWhom):
   encryptsc.encrypt(forWhom,month_file)
   encryptsc.gitcommit(todayCommit)
@@ -94,7 +94,12 @@ if len(sys.argv) > 1 :
                     total += calcTimeRow(row) 
                     print "{} {} minutes".format(row[0] ,how_many_minutes(start,end))
         print "Total := {} minutes".format(total)
-     
+
+     elif sys.argv[1] == "--ticket":
+          if len(sys.argv) > 2 :
+              foundticket, tickets = find(sys.argv[2],0)
+              print tickets   
+                
      elif sys.argv[1] == "--today":
         with open(month_file,"rb") as trackfile:
             trackreader = csv.reader(trackfile)
@@ -129,11 +134,6 @@ if len(sys.argv) > 1 :
                     today = False
         print "Total := {} minutes".format(total)
 
-     elif sys.argv[1] == "--start-day": 
-         write_date() 
-         if(len(sys.argv) > 1):
-             write_start(sys.argv[2])
-  
      elif sys.argv[1] == "--start":
          write_start(sys.argv[2])
            
