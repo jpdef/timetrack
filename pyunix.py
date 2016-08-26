@@ -25,7 +25,7 @@ def docmd(cmd,uargs,input=None):
       stdout=subprocess.PIPE,
       stdin=subprocess.PIPE,
       shell=True,
-      executable='/bin/bash'
+      executable='/bin/zsh'
       )
   if(input is None):
     return p.stdout.read()
