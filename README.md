@@ -1,2 +1,2 @@
 # timetrack
-it tracks my time
+it tracks my time, always
