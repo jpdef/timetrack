@@ -21,19 +21,21 @@ parser.add_argument("--uplocal",action='store_true')
 parser.add_argument("--today",action='store_true')
 parser.add_argument("--upremote",nargs="+")
 parser.add_argument("--dates",nargs="+")
-parser.add_argument("--ticket",nargs="+")
+parser.add_argument("--tickets",nargs="+")
+parser.add_argument("--add",nargs="+")
 args = parser.parse_args(namespace=timetracker)
-
-print timetracker.ticket
-if( not timetracker.todayexists()):
-         timetracker.write_date()   
 
 if args.total:
    total = 0
    for d in timetracker.db:
        if not timetracker.isDate(d) :
-           total += timetracker.calcTimeRow(d) 
-           print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
+           if timetracker.tickets:
+              if (d['subject'] in timetracker.tickets):
+               total += timetracker.calcTimeRow(d) 
+               print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
+           else:
+               total += timetracker.calcTimeRow(d) 
+               print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
    print "Total := {} minutes".format(total)
               
 elif args.dates:
@@ -47,18 +49,18 @@ elif args.dates:
         print "Total := {} minutes".format(total)
 
 elif args.show:
-    print pyunix.cat(month_file)
+    print pyunix.cat(timetracker.month_file)
 
 elif args.edit:
-       subprocess.call(["vim",month_file])
+       subprocess.call(["vim",timetracker.month_file])
  
 elif args.upremote :
     #todo: use subparsing
     timetracker.update_remote(args.upremote)
 
-elif args.local:
+elif args.uplocal:
      timetracker.update_local()
 
-elif sys.argv[1] == "--add":
-    #New Entries
-    add(sys.argv[2:])
+elif args.add:
+    #todo use subparsing
+    timetracker.addFn(args.add)
