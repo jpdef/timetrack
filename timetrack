@@ -20,6 +20,7 @@ parser.add_argument("--edit",action='store_true')
 parser.add_argument("--uplocal",action='store_true')
 parser.add_argument("--today",action='store_true')
 parser.add_argument("--upremote",nargs="+")
+parser.add_argument("--printweek",nargs="+")
 parser.add_argument("--dates",nargs="+")
 parser.add_argument("--tickets",nargs="+")
 parser.add_argument("--add",nargs="+")
@@ -28,26 +29,21 @@ args = parser.parse_args(namespace=timetracker)
 if args.total:
    total = 0
    for d in timetracker.db:
-       if not timetracker.isDate(d) :
-           if timetracker.tickets:
-              if (d['subject'] in timetracker.tickets):
-               total += timetracker.calcTimeRow(d) 
-               print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
-           else:
-               total += timetracker.calcTimeRow(d) 
-               print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
+      if timetracker.tickets:
+         if (d['subject'] in timetracker.tickets):
+          total += timetracker.calcTimeRow(d) 
+          print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
+      else:
+          total += timetracker.calcTimeRow(d) 
+          print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
    print "Total := {} minutes".format(total)
               
 elif args.dates:
-    for date in args.dates:
-        todaylist = timetracker.getDay(date)
-        total = 0 
-        for tl in todaylist:
-            itemtime = timetracker.calcTimeRow(tl)
-            print "{} minutes : {} : {}".format(itemtime,tl['subject'],tl['descript'] )
-            total += itemtime
-        print "Total := {} minutes".format(total)
+     timetracker.print_day(args.dates)
 
+elif args.printweek:
+     timetracker.printweek(args.printweek.spilt("-"))
+   
 elif args.show:
     print pyunix.cat(timetracker.month_file)
 
