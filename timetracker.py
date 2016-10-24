@@ -71,10 +71,10 @@ class tracker:
         return time
 
     def update_remote(self,forWhom):
-      for whom in forWhom:
-          encryptsc.encrypt(whom,self.month_file)
-          encryptsc.gitcommit(self.todayCommit)
-          encryptsc.gitpush()
+        whom = [w for w in forWhom]
+        encryptsc.encrypt(whom,self.month_file)
+        encryptsc.gitcommit(self.todayCommit)
+        encryptsc.gitpush()
     
     def update_local(self):
       encryptsc.gitpull()
