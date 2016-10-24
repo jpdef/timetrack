@@ -9,9 +9,9 @@ import datetime
 
 def encrypt(users,fname):
   cmd = "gpg";
-  uargs = []
-  for user in users:
-      uargs += ['-r',user]
+  uargs = ['-r' + user for user in users ]
+  #for user in users:
+  #    uargs += ['-r',user]
   uargs+=["--armor","--encrypt",fname]
   print uargs
   return pyunix.docmd(cmd,uargs)
