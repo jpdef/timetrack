@@ -12,8 +12,8 @@ import argparse
 class tracker:    
     def __init__(self):
         self.data_dir = os.environ.get("TIMETRACKPATH")
-        self.month_file = self.data_dir + "/october.csv"
-        self.month_file_scramble = self.data_dir + "/october.csv.asc"
+        self.month_file = self.data_dir + "/november.csv"
+        self.month_file_scramble = self.data_dir + "/november.csv.asc"
         self.todayCommit = datetime.date.today().strftime("%d-%m-%y")
 
         self.db = []
