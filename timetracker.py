@@ -7,6 +7,7 @@ import csv
 import time
 import datetime
 import encryptsc
+import rt
 import argparse
 
 class tracker:    
@@ -22,15 +23,46 @@ class tracker:
             for row in reader:
                 self.db.append(row)
     
-    def print_day(self,dates):
+    def submit_report(self,dates):
+        #Needs to write seperate report for each ticket in list
+        #Search through tickets find ticket numbers
+        for t in self.tickets:
+            print "Ticket:", t
+            #Collect time for tickets
+            totalTime = self.getTimeOnTicket(dates,t)
+            #Generate report
+            report = self.getReportonTicket(dates,t)
+            #Post
+            print report, totalTime, '\n'
+            rt.submitToTicket(report,totalTime,t  )
+
+    def print_dates(self,dates):
         datelist = self.getDates(dates)
-        total = 0 
+        total = 0
         for item in datelist:
             itemtime = self.calcTimeRow(item)
-            print "{} : {} minutes : {} : {}".format(item['date'],itemtime,item['subject'],item['description'] )
+            print "{} : {} minutes : {} : {}".format(item['date']
+                    ,itemtime,item['ticketnumber'],item['description'] )
             total += itemtime
         print "Total := {} minutes".format(total)
-     
+    
+    def getTimeOnTicket(self, dates,ticket):
+        datelist = self.getDates(dates,ticket)
+        total = 0
+        for item in datelist:
+            itemtime = self.calcTimeRow(item)
+            total += itemtime       
+        return total
+
+    def getReportonTicket(self, dates,ticket): 
+        datelist = self.getDates(dates,ticket)
+        itemreport = ""
+        
+        for item in datelist:
+            itemtime = self.calcTimeRow(item)
+            itemreport += "{} : {} minutes : {} : {}\n".format(item['date'],itemtime,item['ticketnumber'],item['description'] )
+        return itemreport 
+
     def print_week(self,dates):
         pass
    
@@ -41,12 +73,16 @@ class tracker:
         
         return (hend - hstart)*60 + (mend -mstart)
 
-    def write_start(self,subject):
+    def write_start(self,ticketnumber):
         with open(month_file,"a") as trackfile:
             trackwriter = csv.writer(trackfile, delimiter=',')
-            trackwriter.writerow([subject,datetime.datetime.now().strftime("%H:%M")])
+            trackwriter.writerow([ticketnumber,datetime.datetime.now().strftime("%H:%M")])
     
     def write_date(self):
+        """
+        Creates trackwriter
+        Wirtes the current date into csv file
+        """
         with open(self.month_file,"a") as trackfile:
             trackwriter = csv.writer(trackfile, delimiter=',')
             trackwriter.writerow([datetime.datetime.now().strftime("%m-%d")])
@@ -56,11 +92,16 @@ class tracker:
         end   = time.strptime(d['end'], "%H:%M")
         return  self.how_many_minutes(start,end)
 
-    def getDates(self,dates):
+    def getDates(self,dates,ticket=None):
         datelist = []
         for date in dates:
             datelist += self.getDate(date)
-        datelist = filter(lambda x : x['subject'] in self.tickets, datelist ) 
+        if 'all' not in self.tickets:
+            if ticket is None:
+               datelist = filter(lambda x : x['ticketnumber'] in self.tickets, datelist ) 
+            else:
+               datelist = filter(lambda x : x['ticketnumber'] in ticket, datelist )
+
         return datelist 
 
     def getDate(self,strdate):

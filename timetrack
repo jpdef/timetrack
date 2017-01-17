@@ -19,6 +19,7 @@ parser.add_argument("--show",action='store_true')
 parser.add_argument("--edit",action='store_true')
 parser.add_argument("--uplocal",action='store_true')
 parser.add_argument("--today",action='store_true')
+parser.add_argument("--report", action="store_true")
 parser.add_argument("--upremote",nargs="+")
 parser.add_argument("--printweek",nargs="+")
 parser.add_argument("--dates",nargs="+")
@@ -30,16 +31,19 @@ if args.total:
    total = 0
    for d in timetracker.db:
       if timetracker.tickets:
-         if (d['subject'] in timetracker.tickets):
+         if (d['ticketnumber'] in timetracker.tickets):
           total += timetracker.calcTimeRow(d) 
-          print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
+          print "{} {} minutes".format(d['ticketnumber'],timetracker.calcTimeRow(d))
       else:
           total += timetracker.calcTimeRow(d) 
-          print "{} {} minutes".format(d['subject'],timetracker.calcTimeRow(d))
+          print "{} {} minutes".format(d['ticketnumber'],timetracker.calcTimeRow(d))
    print "Total := {} minutes".format(total)
+
+elif args.report:
+     timetracker.submit_report(args.dates)
               
-elif args.dates:
-     timetracker.print_day(args.dates)
+elif args.dates and not args.report:
+     timetracker.print_dates(args.dates)
 
 elif args.printweek:
      timetracker.printweek(args.printweek.spilt("-"))
