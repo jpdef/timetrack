@@ -7,7 +7,6 @@ import csv
 import time
 import datetime
 import encryptsc
-import rt
 import argparse
 
 class tracker:    
