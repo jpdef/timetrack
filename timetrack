@@ -20,6 +20,7 @@ parser.add_argument("--edit",action='store_true')
 parser.add_argument("--uplocal",action='store_true')
 parser.add_argument("--today",action='store_true')
 parser.add_argument("--report", action="store_true")
+parser.add_argument("--list", action="store_true")
 parser.add_argument("--upremote",nargs="+")
 parser.add_argument("--printweek",nargs="+")
 parser.add_argument("--dates",nargs="+")
@@ -64,3 +65,6 @@ elif args.uplocal:
 elif args.add:
     #todo use subparsing
     timetracker.addFn(args.add)
+
+elif args.list:
+    timetracker.list_tickets()

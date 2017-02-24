@@ -20,6 +20,7 @@ class tracker:
         self.todayCommit = datetime.date.today().strftime("%d-%m-%y")
 
         self.db = []
+        self.rt = rt.RT()
         with open(self.month_file,"rb") as trackfile:
             reader = csv.DictReader(trackfile)
             for row in reader:
@@ -34,7 +35,7 @@ class tracker:
 
 
     def list_tickets(self):
-        rt.listTickets(self.data_dir)
+        self.rt.listTickets(self.data_dir)
    
     
 
@@ -55,7 +56,7 @@ class tracker:
 	    print report, totalTime, '\n'
 	    toContinue = raw_input("Does this look correct? [y/n]\n")
 	    if toContinue is  "y":
-                rt.submitToTicket(self.data_dir,report,totalTime,t  )
+                self.rt.submitToTicket(self.data_dir,report,totalTime,t  )
    
     """
     Gets all ticket numbers which have dates specified by user arguement
@@ -115,7 +116,7 @@ class tracker:
 
  
     def how_many_minutes(self,start,end):
-        hstart , mstart = start.tm_hour, start.tm_min
+        hstart , mstart = staself.rt.tm_hour, staself.rt.tm_min
         hend   , mend = end.tm_hour, end.tm_min
         
         return (hend - hstart)*60 + (mend -mstart)
