@@ -8,12 +8,15 @@ import time
 import datetime
 import encryptsc
 import argparse
+import rt
+import requests
+#import browsercookie
 
 class tracker:    
     def __init__(self):
         self.data_dir = os.environ.get("TIMETRACKPATH")
-        self.month_file = self.data_dir + "/january.csv"
-        self.month_file_scramble = self.data_dir + "/january.csv.asc"
+        self.month_file = self.data_dir + "/febuary.csv"
+        self.month_file_scramble = self.data_dir + "/febuary.csv.asc"
         self.todayCommit = datetime.date.today().strftime("%d-%m-%y")
 
         self.db = []
@@ -21,10 +24,26 @@ class tracker:
             reader = csv.DictReader(trackfile)
             for row in reader:
                 self.db.append(row)
+  
+    """
+     Request Tracker Functions 
+
+       -lists tickets that are owned by user
+       -submits time and message to tickets 
+    """
+
+
+    def list_tickets(self):
+        rt.listTickets(self.data_dir)
+   
     
+
     def submit_report(self,dates):
         #Needs to write seperate report for each ticket in list
         #Search through tickets find ticket numbers
+	if "all" in self.tickets:
+	   self.tickets = list(set(self.getTicketNoFromDates(dates)))
+        
         for t in self.tickets:
             print "Ticket:", t
             #Collect time for tickets
@@ -32,9 +51,35 @@ class tracker:
             #Generate report
             report = self.getReportonTicket(dates,t)
             #Post
-            print report, totalTime, '\n'
-            rt.submitToTicket(report,totalTime,t  )
+            print "Here is your report:"
+	    print report, totalTime, '\n'
+	    toContinue = raw_input("Does this look correct? [y/n]\n")
+	    if toContinue is  "y":
+                rt.submitToTicket(self.data_dir,report,totalTime,t  )
+   
+    """
+    Gets all ticket numbers which have dates specified by user arguement
+    or function argument
+    """
+    def getTicketNoFromDates(self,dates=None):
+        if dates is None:
+	   dates = self.dates
+        rows = self.getDates(dates)
+        ticket_numbers = [x['ticketnumber'] for x in rows]
+        return ticket_numbers
+    
 
+    """
+    Write code here to test out
+    """
+    def tester(self,dates=None):
+	print "foo"
+
+
+    """
+    Prints a report with each row that has date specified by function
+    Also prints a sum of time for these rows
+    """
     def print_dates(self,dates):
         datelist = self.getDates(dates)
         total = 0
@@ -45,6 +90,10 @@ class tracker:
             total += itemtime
         print "Total := {} minutes".format(total)
     
+    """
+    Calculates the time for all rows that have ticket number and date
+    specified by function
+    """
     def getTimeOnTicket(self, dates,ticket):
         datelist = self.getDates(dates,ticket)
         total = 0
@@ -53,6 +102,8 @@ class tracker:
             total += itemtime       
         return total
 
+
+    
     def getReportonTicket(self, dates,ticket): 
         datelist = self.getDates(dates,ticket)
         itemreport = ""
@@ -62,9 +113,6 @@ class tracker:
             itemreport += "{} : {} minutes : {} : {}\n".format(item['date'],itemtime,item['ticketnumber'],item['description'] )
         return itemreport 
 
-    def print_week(self,dates):
-        pass
-   
  
     def how_many_minutes(self,start,end):
         hstart , mstart = start.tm_hour, start.tm_min
@@ -91,14 +139,19 @@ class tracker:
         end   = time.strptime(d['end'], "%H:%M")
         return  self.how_many_minutes(start,end)
 
+    """
+    Returns list of tickets from specified dates,
+    and if tickets are specifcied then also ticketnumber
+    """
     def getDates(self,dates,ticket=None):
         datelist = []
         for date in dates:
             datelist += self.getDate(date)
-        if 'all' not in self.tickets:
-            if ticket is None:
+        if ticket is None and self.tickets:
+            if 'all' not in self.tickets:
                datelist = filter(lambda x : x['ticketnumber'] in self.tickets, datelist ) 
-            else:
+        elif ticket:
+            if 'all' not in ticket:
                datelist = filter(lambda x : x['ticketnumber'] in ticket, datelist )
 
         return datelist 
@@ -110,6 +163,9 @@ class tracker:
                 time.append(d) 
         return time
 
+    """
+    Github functions to update code with encrypted file
+    """
     def update_remote(self,forWhom):
         whom = [w for w in forWhom]
         encryptsc.encrypt(whom,self.month_file)
