@@ -11,60 +11,55 @@ import argparse
 import timetracker
 
 
-
-timetracker = timetracker.tracker();
+timetracker = timetracker.tracker()
 parser = argparse.ArgumentParser(prog="TIMETRACK")
-parser.add_argument("--total",action='store_true')
-parser.add_argument("--show",action='store_true')
-parser.add_argument("--edit",action='store_true')
-parser.add_argument("--uplocal",action='store_true')
-parser.add_argument("--today",action='store_true')
+parser.add_argument("--total", action='store_true')
+parser.add_argument("--show", action='store_true')
+parser.add_argument("--edit", action='store_true')
 parser.add_argument("--report", action="store_true")
 parser.add_argument("--list", action="store_true")
-parser.add_argument("--upremote",nargs="+")
-parser.add_argument("--printweek",nargs="+")
-parser.add_argument("--dates",nargs="+")
-parser.add_argument("--tickets",nargs="+")
-parser.add_argument("--add",nargs="+")
+parser.add_argument("--indirect", action="store_true")
+parser.add_argument("--uplocal", action='store_true')
+parser.add_argument("--upremote", nargs="+")
+parser.add_argument("--dates", nargs="+")
+parser.add_argument("--tickets", nargs="+")
+parser.add_argument("--add", nargs="+")
 args = parser.parse_args(namespace=timetracker)
 
 if args.total:
-   total = 0
-   for d in timetracker.db:
-      if timetracker.tickets:
-         if (d['ticketnumber'] in timetracker.tickets):
-          total += timetracker.calcTimeRow(d) 
-          print "{} {} minutes".format(d['ticketnumber'],timetracker.calcTimeRow(d))
-      else:
-          total += timetracker.calcTimeRow(d) 
-          print "{} {} minutes".format(d['ticketnumber'],timetracker.calcTimeRow(d))
-   print "Total := {} minutes".format(total)
+    total = 0
+    for d in timetracker.db:
+        if timetracker.tickets:
+            if (d['ticketnumber'] in timetracker.tickets):
+                total += timetracker.calcTimeRow(d)
+                print "{} {} minutes".format(d['ticketnumber'], timetracker.calcTimeRow(d))
+        else:
+            total += timetracker.calcTimeRow(d)
+            print "{} {} minutes".format(d['ticketnumber'], timetracker.calcTimeRow(d))
+    print "Total := {} minutes".format(total)
 
 elif args.report:
-     timetracker.submit_report(args.dates)
-              
-elif args.dates and not args.report:
-     timetracker.print_dates(args.dates)
+    timetracker.submit_report(args.dates)
 
-elif args.printweek:
-     timetracker.printweek(args.printweek.spilt("-"))
-   
+elif args.dates and not args.report:
+    timetracker.print_dates(args.dates)
+
 elif args.show:
     print pyunix.cat(timetracker.month_file)
 
 elif args.edit:
-       subprocess.call(["vim",timetracker.month_file])
- 
-elif args.upremote :
-    #todo: use subparsing
+    subprocess.call(["vim", timetracker.month_file])
+
+elif args.upremote:
+    # todo: use subparsing
     timetracker.update_remote(args.upremote)
 
 elif args.uplocal:
-     timetracker.update_local()
+    timetracker.update_local()
 
 elif args.add:
-    #todo use subparsing
-    timetracker.addFn(args.add)
+    # todo use subparsing
+    timetracker.add_row(args.add)
 
 elif args.list:
     timetracker.list_tickets()
